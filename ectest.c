@@ -153,7 +153,7 @@ int main()
     for (int i = 0; i < size; i += 3)
     {
         mpz_set_str(k, TEST_VECTORS[i], 10);
-        gmp_printf("k : %Zx\n", k);
+        gmp_printf("k : %Zd\n", k);
         point p = mulPoint(k, G);
         char x[64];
         gmp_sprintf(x, "%Z064X", p.X);
@@ -162,7 +162,7 @@ int main()
         char y[64];
         gmp_sprintf(y, "%Z064X", p.Y);
         int ry = strcmp(y, TEST_VECTORS[i + 2]);
-        printf("x : %s\n", y);
+        printf("y : %s\n", y);
         if (rx != 0 && ry != 0)
         {
             flg = -1;

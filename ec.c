@@ -58,13 +58,13 @@ point addPoint(point p1, point p2)
     }
     mpz_t lam;
     mpz_init(lam);
-    mpz_sub(lam, p2.Y, p1.Y);
-    mpz_t tmp;
-    mpz_init(tmp);
-    mpz_sub(tmp, p2.X, p1.X);
-    mpz_invert(tmp, tmp, P);
-    mpz_mul(lam, lam, tmp);
-    mpz_mod(lam, lam, P);
+    mpz_sub(lam, p2.Y, p1.Y);     // lam = y2 - y1
+    mpz_t tmp;                    //
+    mpz_init(tmp);                //
+    mpz_sub(tmp, p2.X, p1.X);     // tmp = x2 - x1
+    mpz_invert(tmp, tmp, P);      // tmp = 1 / (x2 - x1)
+    mpz_mul(lam, lam, tmp);       // lam = (y2 - y1) / (x2 - x1)
+    mpz_mod(lam, lam, P);         // lam = lam mod P
     mpz_powm_ui(p3.X, lam, 2, P); // x3 = lam^2
     mpz_sub(p3.X, p3.X, p1.X);    // x3 = lam^2 - x1
     mpz_sub(p3.X, p3.X, p2.X);    // x3 = lam^2 - x1 - x2
