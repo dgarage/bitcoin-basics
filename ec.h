@@ -8,12 +8,12 @@ typedef struct
 {
     mpz_t X;
     mpz_t Y;
-} point;
+} point_t[1];
 
-point newPoint();
+void point_init(point_t);
 
-point addPoint(point p1, point p2);
+void point_add(point_t, const point_t, const point_t);
 
-point mulPoint(mpz_t k, point p);
+void point_mul(point_t, const mpz_t, const point_t);
 
 #endif

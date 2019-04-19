@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <gmp.h>
 #include "ec.h"
 
 char *TEST_VECTORS[] = {
@@ -143,9 +144,10 @@ char *TEST_VECTORS[] = {
 
 int main()
 {
-    point G = newPoint();
-    mpz_init_set_str(G.X, "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798", 16);
-    mpz_init_set_str(G.Y, "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8", 16);
+    point_t G;
+    point_init(G);
+    mpz_init_set_str(G->X, "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798", 16);
+    mpz_init_set_str(G->Y, "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8", 16);
     int size = sizeof(TEST_VECTORS) / sizeof(TEST_VECTORS[0]);
     mpz_t k;
     mpz_init(k);
@@ -154,13 +156,15 @@ int main()
     {
         mpz_set_str(k, TEST_VECTORS[i], 10);
         gmp_printf("k : %Zd\n", k);
-        point p = mulPoint(k, G);
+        point_t p;
+        point_init(p);
+        point_mul(p, k, G);
         char x[64];
-        gmp_sprintf(x, "%Z064X", p.X);
+        gmp_sprintf(x, "%Z064X", p->X);
         int rx = strcmp(x, TEST_VECTORS[i + 1]);
         printf("x : %s\n", x);
         char y[64];
-        gmp_sprintf(y, "%Z064X", p.Y);
+        gmp_sprintf(y, "%Z064X", p->Y);
         int ry = strcmp(y, TEST_VECTORS[i + 2]);
         printf("y : %s\n", y);
         if (rx != 0 && ry != 0)
