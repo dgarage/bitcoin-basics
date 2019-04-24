@@ -41,16 +41,22 @@ typedef struct _sha256context
     unsigned char buf[SHA256_BLOCK_SIZE];
 } sha256context[1];
 
-void hex2bs(unsigned char *, const char *);
-
 void sha256_init(sha256context);
 
 void sha256_write(sha256context, const char *, size_t);
 
 void sha256_update(sha256context);
 
-void sha256_finish(sha256context, char *);
+void sha256_finish(sha256context, unsigned char *);
+
+void hmac_sha256(unsigned char *, char *, size_t, char *, size_t);
 
 void sha256context_dump(sha256context);
+
+void hextobs(unsigned char *, const char *);
+
+void print_h(const unsigned char *, size_t);
+
+void sprint_h(char *, const unsigned char *, size_t);
 
 #endif

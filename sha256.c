@@ -79,10 +79,9 @@ void sha256_update(sha256context ctx)
     ctx->H[5] += f;
     ctx->H[6] += g;
     ctx->H[7] += h;
-    // sha256context_dump(ctx);
 }
 
-void sha256_finish(sha256context ctx, char *hash)
+void sha256_finish(sha256context ctx, unsigned char *hash)
 {
     unsigned long p = (ctx->bits >> 3) % SHA256_BLOCK_SIZE;
     unsigned int len = SHA256_BLOCK_SIZE - p;
@@ -102,21 +101,53 @@ void sha256_finish(sha256context ctx, char *hash)
     pad[len - 2] = ctx->bits >> 8;
     pad[len - 1] = ctx->bits;
     sha256_write(ctx, pad, len);
-    sprintf(hash, "%08x%08x%08x%08x%08x%08x%08x%08x",
-            ctx->H[0], ctx->H[1], ctx->H[2], ctx->H[3],
-            ctx->H[4], ctx->H[5], ctx->H[6], ctx->H[7]);
+    for (int i = 0; i < SHA256_WORD_SIZE; i++)
+    {
+        hash[i * 4] = ctx->H[i] >> 24;
+        hash[i * 4 + 1] = ctx->H[i] >> 16;
+        hash[i * 4 + 2] = ctx->H[i] >> 8;
+        hash[i * 4 + 3] = ctx->H[i];
+    }
 }
 
-void hex2bs(unsigned char *bs, const char *hex)
+void hmac_sha256(unsigned char *hmac, char *key, size_t key_len, char *data, size_t data_len)
 {
-    int len = strlen(hex);
-    for (int i = 0; i < len; i += 2)
+    unsigned char k[32];
+    unsigned char ipad[64];
+    unsigned char opad[64];
+    memset(k, 0, 32);
+    memset(ipad, 0, 64);
+    memset(opad, 0, 64);
+    sha256context ctx;
+    if (key_len > 32)
     {
-        unsigned int x;
-        sscanf((char *)(hex + i), "%02x", &x);
-        bs[i / 2] = x;
+        sha256_init(ctx);
+        sha256_write(ctx, key, key_len);
+        sha256_finish(ctx, k);
     }
-    return;
+    else
+    {
+        memcpy(k, key, key_len);
+    }
+    memcpy(ipad, k, 32);
+    memcpy(opad, k, 32);
+    // H(K XOR opad, H(K XOR ipad, text))
+    for (int i = 0; i < 64; i++)
+    {
+        ipad[i] ^= 0x36;
+        opad[i] ^= 0x5c;
+    }
+    // H(K XOR ipad, text)
+    sha256_init(ctx);
+    sha256_write(ctx, ipad, 64);
+    sha256_write(ctx, data, data_len);
+    unsigned char tmp[32];
+    sha256_finish(ctx, tmp);
+    // H(K XOR opad, H(K XOR ipad, text))
+    sha256_init(ctx);
+    sha256_write(ctx, opad, 64);
+    sha256_write(ctx, tmp, 32);
+    sha256_finish(ctx, hmac);
 }
 
 void sha256context_dump(sha256context ctx)
@@ -132,4 +163,34 @@ void sha256context_dump(sha256context ctx)
         printf("%02x", ctx->buf[i]);
     }
     printf("\n");
+}
+
+void print_h(const unsigned char *bs, size_t len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        printf("%02x", bs[i]);
+    }
+    printf("\n");
+}
+
+void sprint_h(char *hex, const unsigned char *bs, size_t len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        sprintf(hex + i * 2, "%02x", bs[i]);
+    }
+}
+
+void hextobs(unsigned char *bs, const char *hex)
+{
+    int len = strlen(hex);
+    for (int i = 0; i < len; i += 2)
+    {
+        unsigned int x;
+        sscanf((char *)(hex + i), "%02x", &x);
+        bs[i / 2] = x;
+    }
+
+    return;
 }
