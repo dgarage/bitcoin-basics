@@ -13,6 +13,12 @@ ectest: ec
 ecspeedtest: ec
 	./ecspeedtest
 
+sha256:
+	$(CC) -o sha256test sha256.c sha256test.c $(LIBS)
+
+sha256test: sha256
+	./sha256test
+
 clear:
 	rm -f ectest
 	rm -f ecspeedtest
