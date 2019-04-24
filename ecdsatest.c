@@ -22,7 +22,12 @@ int testNonceRFC6979()
         char *K = TEST_ECDSA[i + 1];
         mpz_t k;
         mpz_init(k);
-        nonceRFC6979(k, x, m);
+        unsigned char h[32];
+        sha256context ctx;
+        sha256_init(ctx);
+        sha256_write(ctx, m, strlen(m));
+        sha256_finish(ctx, h);
+        nonceRFC6979(k, x, h);
         char str[64];
         gmp_sprintf(str, "%064ZX", k);
         int ret = strcmp(str, K);

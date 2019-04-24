@@ -12,7 +12,7 @@ int verify(const mpz_t s, const mpz_t r, const point_t p, const unsigned char *m
 {
 }
 
-void nonceRFC6979(mpz_t k, const mpz_t x, const unsigned char *m)
+void nonceRFC6979(mpz_t k, const mpz_t x, const unsigned char *h)
 {
     mpz_t N;
     mpz_init_set_str(N, "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141", 16);
@@ -20,10 +20,9 @@ void nonceRFC6979(mpz_t k, const mpz_t x, const unsigned char *m)
     // https://tools.ietf.org/html/rfc6979#section-3.2
     // a.  Process m through the hash function H, yielding:
     //        h1 = H(m)
+    // パラメータがハッシュ値なので、コピーのみ
     unsigned char h1[32];
-    sha256_init(ctx);
-    sha256_write(ctx, m, strlen(m));
-    sha256_finish(ctx, h1);
+    memcpy(h1, h, 32);
     // b.  Set:
     //       V = 0x01 0x01 0x01 ... 0x01
     unsigned char V[32];
