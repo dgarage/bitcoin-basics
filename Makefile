@@ -10,6 +10,12 @@ ec: clear
 ectest: ec
 	./ectest
 
+ecdsa: clear
+	$(CC) -o ecdsatest -o ecdsatest ec.c sha256.c ecdsa.c ecdsatest.c $(LIBS)
+
+ecdsatest: ecdsa
+	./ecdsatest
+
 ecspeedtest: ec
 	./ecspeedtest
 
@@ -22,4 +28,6 @@ sha256test: sha256
 clear:
 	rm -f ectest
 	rm -f ecspeedtest
+	rm -f sha256test
+	rm -f ecdsatest
 
