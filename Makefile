@@ -11,7 +11,7 @@ ectest: ec
 	./ectest
 
 ecdsa: clear
-	$(CC) -o ecdsatest -o ecdsatest ec.c sha256.c ecdsa.c ecdsatest.c $(LIBS)
+	$(CC) -o ecdsatest ec.c sha256.c ecdsa.c ecdsatest.c $(LIBS)
 
 ecdsatest: ecdsa
 	./ecdsatest

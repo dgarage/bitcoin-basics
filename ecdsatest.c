@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <gmp.h>
 #include "sha256.h"
 #include "ecdsa.h"
 #include "ec.h"
@@ -40,12 +41,48 @@ int testNonceRFC6979()
     return 0;
 }
 
+int testECDSA()
+{
+    mpz_t s;
+    mpz_init(s);
+    mpz_t r;
+    mpz_init(r);
+    mpz_t x;
+    mpz_init_set_ui(x,1);
+    unsigned char h[32];
+    hextobs(h, "000000000000000000000000000000000000000000000000000000000000000");
+    sign(s, r, x, h);
+    point_t G;
+    point_init(G);
+    mpz_init_set_str(G->X, "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798", 16);
+    mpz_init_set_str(G->Y, "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8", 16);
+    point_t P;
+    point_init(P);
+    point_mul(P, x, G);
+    int ret = verify(s, r, P, h);
+    return 0;
+}
+
 int main()
 {
-    int ret = testNonceRFC6979();
+    int ret;
+    ret = testNonceRFC6979();
     if (ret != 0)
     {
         printf("Test nonceRFC6979 Fail!\n");
     }
-    printf("Test nonceRFC6979 Complete!\n");
+    else
+    {
+        printf("Test nonceRFC6979 Complete!\n");
+    }
+    ret = testECDSA();
+    if (ret != 0)
+    {
+        printf("Test ECDSA Fail!\n");
+    }
+    else
+    {
+        printf("Test ECDSA Complete!\n");
+    }
+    return ret;
 }
